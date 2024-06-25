@@ -20,28 +20,19 @@ base directory
 |
 |- output/		                # Will contain output from pipeline after it is run
 |
-|- snakemake_submission.sh		# Submission script for pipeline
-|
 |- snakefile		            # Pipeline info
 |
 |- host_decontam.yml		    # Conda environment
+|
+|- snakemake_submission.sh		# Submission script for pipeline
 +
 ```
 
-## Ta
-1. `oral_phyloseq.Rmd` - clean 16S rRNA gene amplicon sequence data and generate phyloseq object
-2. `decontam.Rmd` - remove potential contaminants
-3. `qc.Rmd` - additional QC and cleaning of the phyloseq object
-4. `extraction_comparison.Rmd` - compare Qiagen and PowerSoil extraction kit data
-5. `microbiome_characterization.Rmd` - examine metrics for standard microbiome characteristics (alpha and beta diversity)
-6. `random_forest.Rmd` - use Random Forests to predict lifestyle based on lifestyle survey and microbiome data
-7. `differential_abundance.Rmd` - perform differential abundance analysis with ALDEx2 to identify taxa that differ based on lifestyle
-8. `microbiome_trend.Rmd` - perform trend test on all genera to see which microbial abundances follow the lifestyle trend
-9. `CCA.Rmd` - conduct CCA to identify which specific lifestyle factors correlate with microbiome composition
-10. `taxa_lifestyle.Rmd` - identify significant associations between specific lifestyle factors and DA microbes identified from the trend test.
-11. `picrust2_prep.Rmd` - prepping data for PICRUSt2
-12. `picrust_stratified.sh` (shell) - run stratified version of PICRUSt2 to predict pathway abundances.
-13. `picrust_analysis.Rmd` - analyze PICRUSt2 output. All PICRUSt2 output from `picrust_stratified.sh` is assumed to be stored in its own directory `picrust2_qiagen_output\`
-14. `network_analysis.Rmd` - conduct network analysis of the microbiome using SparCC
-15. `gut_oral_comparison.Rmd` - examine the relationship between the oral and gut microbiomes
+## snakefile
+This file contains the pipeline info. Assuming no changes to bowtie2 or SNAP steps (which are default), the only aspects that need modifying are the variables starting at line 3 in order to point to the sequences, references, conda environment, and number of threads. All output directories will be generated as the files are created. Please note that snakefile assumes that fastqc is loaded as a module (line 41), so this may need to be modified and loaded within a conda environment.
 
+## host_decontam.yml
+This file contains info for building the conda environment used in this pipeline. It contains samtools, bowtie2, and SNAP. 
+
+## snakemake_submission.sh
+This file is the slurm script for submitting and running the pipeline.

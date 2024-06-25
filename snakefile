@@ -1,13 +1,16 @@
 # The purpose of this script is to QC the microbiome reads and remove host contaminants 
 
-# define variables
+# define variables - modify as needed
 initial_input_dir="data/raw/"
-fastqc_input=initial_input_dir+"{sample}_{read}.fastq.gz"
-bowtie2_input_r1=initial_input_dir+"{sample}_R1.fastq.gz"
-bowtie2_input_r2=initial_input_dir+"{sample}_R2.fastq.gz"
 bowtie_ref="data/refs/hg38_index/hg38"
 snap_ref="data/refs/hg38_snap"
 conda_env="host_decontam.yml"
+threads=15
+
+# define variables - DO NOT CHANGE
+fastqc_input=initial_input_dir+"{sample}_{read}.fastq.gz"
+bowtie2_input_r1=initial_input_dir+"{sample}_R1.fastq.gz"
+bowtie2_input_r2=initial_input_dir+"{sample}_R2.fastq.gz"
 
 # define sample files 
 (SAMPLES,READS,)=glob_wildcards(os.path.join(initial_input_dir,"{sample}_{read}.fastq.gz"))
@@ -34,10 +37,11 @@ rule fastqc_initial:
         "output/1.fastqc_initial/{sample}_{read}_fastqc.zip"
     params:
         dir="output/1.fastqc_initial"
+    threads: threads
     shell:
         "mkdir -p {params.dir};"
         "module load fastqc;"
-        "fastqc -t 5 {input} -o {params.dir}"
+        "fastqc -t {threads} {input} -o {params.dir}"
 
 rule bowtie2_align:
     input:
@@ -52,7 +56,7 @@ rule bowtie2_align:
         index_prefix=bowtie_ref
     conda:
         conda_env
-    threads: 15
+    threads: threads
     shell:
         '''
         bowtie2 -p {threads} \
@@ -110,7 +114,7 @@ rule snap_align:
         index_prefix=snap_ref
     conda:
         conda_env
-    threads: 15
+    threads: threads
     shell:
         '''
         snap-aligner paired {params.index_prefix} \
@@ -166,7 +170,8 @@ rule fastqc_final:
         "output/4.fastqc_final/{sample}_unmapped_{read}_fastqc.zip"
     params:
         dir="output/4.fastqc_final"
+    threads: threads
     shell:
         "mkdir -p {params.dir};"
         "module load fastqc;"
-        "fastqc -t 5 {input} -o {params.dir}"
+        "fastqc -t {threads} {input} -o {params.dir}"
