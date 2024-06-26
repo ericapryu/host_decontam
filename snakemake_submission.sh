@@ -12,12 +12,6 @@
 
 d1=$(date +%s) 
 
-# set variables
-RUN_PATH="/storage/group/exd44/default/epr5208/Hershey_project/snakemake_run"
-
-# set working directory
-cd $RUN_PATH
-
 pwd 
 echo "Job started"
 
